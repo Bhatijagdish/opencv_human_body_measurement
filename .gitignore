@@ -1,0 +1,10 @@
+deeplab_model/
+models/
+venv/
+.idea/
+.venv/
+__pycache__/
+**/__pycache__/
+**/*.pyc
+*.pyc
+

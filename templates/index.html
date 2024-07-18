@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Image To Recommend Dress Size</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+            margin-left: 200px;
+            margin-right: 200px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        input[type="number"] {
+            margin-top: 20px;
+        }
+        .upload-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .upload-btn:hover {
+            background-color: #45a049;
+        }
+        #selected-img {
+            max-width: 250px;
+            margin-top: 20px;
+            display: none;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #height-input,
+        #gender-input,
+        #region-input,
+        #submit-btn {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        #height-input:focus,
+        #gender-input:focus,
+        #submit-btn:focus {
+            border-color: #4CAF50;
+        }
+        #submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #submit-btn:hover {
+            background-color: #45a049;
+        }
+        .output {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        .loader {
+            border: 6px solid #f3f3f3; /* Light grey */
+            border-top: 6px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            margin-top: 20px;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Image To Recommend Dress Size</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <label for="file-input" class="upload-btn">Choose Image</label>
+            <input type="file" id="file-input" name="file" accept=".png, .jpg, .jpeg" required onchange="previewImage(event)">
+            <!-- <input type="number" id="height-input" name="height" placeholder="Input Height (cm)" required> -->
+            <select id="gender-input" name="gender" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+            <select id="region-input" name="region" required>
+                <option value="US">US</option>
+                <option value="UK">UK</option>
+                <option value="EU">EU</option>
+            </select>
+            <input type="submit" id="submit-btn" value="Upload">
+        </form>
+        <img id="selected-img" class="output-img" alt="Selected Image">
+        <div id="output" class="output"></div>
+        <div id="loader" class="loader"></div>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            var selectedFile = event.target.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                var imgElement = document.getElementById("selected-img");
+                imgElement.src = event.target.result;
+                imgElement.style.display = "block";
+            };
+
+            reader.readAsDataURL(selectedFile);
+        }
+
+        document.getElementById("upload-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+
+            var loader = document.getElementById("loader");
+            loader.style.display = "block";
+
+            fetch("/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                loader.style.display = "none";
+                document.getElementById("output").innerHTML = data;
+                document.getElementById("output").style.display = "block";
+            })
+            .catch(error => {
+                loader.style.display = "none";
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>
